@@ -1,0 +1,6 @@
+# 双系统安装(安装ubuntu16.04+Windows)
+
+这个教程是安装双系统的教程，目前先以参考博客为内容，之后自己重新补全
+
+**博客网址**
+https://blog.csdn.net/weixin_41357783/article/details/107585502
