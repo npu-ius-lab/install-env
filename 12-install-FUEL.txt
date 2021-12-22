@@ -1,0 +1,64 @@
+FUEL的安装步骤
+    官方网址：
+    https://github.com/HKUST-Aerial-Robotics/FUEL
+1.安装依赖
+    sudo apt-get install libarmadillo-dev ros-melodic-nlopt
+2.安装CUDA（以下步骤是安装CUDA11即官网最新版本）（X86系统下的Ubuntu16.04）
+    网址：https://developer.nvidia.com/zh-cn/cuda-toolkit
+    步骤：
+        2.1
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-ubuntu1604.pin
+        2.2
+        sudo mv cuda-ubuntu1604.pin /etc/apt/preferences.d/cuda-repository-pin-600
+        2.3
+        wget https://developer.download.nvidia.com/compute/cuda/11.3.1/local_installers/cuda-repo-ubuntu1604-11-3-local_11.3.1-465.19.01-1_amd64.deb
+        2.4
+        sudo dpkg -i cuda-repo-ubuntu1604-11-3-local_11.3.1-465.19.01-1_amd64.deb
+        2.5
+        sudo apt-key add /var/cuda-repo-ubuntu1604-11-3-local/7fa2af80.pub
+        2.6
+        sudo apt-get update
+        2.7
+        sudo apt-get -y install cuda
+3.创建工作空间并下载FUEL源码
+        mkdir -p catkin_ws/src
+        cd catkin_ws
+        catkin_make
+        cd src/
+        git clone https://github.com.cnpmjs.org/HKUST-Aerial-Robotics/FUEL.git
+        catkin_make
+4.根据你自己的显卡版本以及CUDA版本修改cmakelists文件
+        查看自己显卡以及驱动版本命令：
+            nvidia-smi
+        步骤：打开uav_simulator文件中的local_sensing包中的CMakelist.txt文件 
+            根据自己的显卡型号以及CUDA版本修改以下语句中对应的数字
+        set(CUDA_NVCC_FLAGS 
+            -gencode arch=compute_61,code=sm_61;
+        ) 
+    数字修改提示：
+        https://github.com/tpruvot/ccminer/wiki/Compatibility
+        https://github.com/tpruvot/ccminer/blob/windows/Makefile.am#L119
+        http://arnon.dk/matching-sm-architectures-arch-and-gencode-for-various-nvidia-cards/
+    我的显卡型号是GTX1650,CUDA版本是11.1，因此我对应的数字是75，将以上语句中的两个61修改为75即可
+5.可能遇见的问题
+    5.1在编译的时候会遇见nvcc fatal: Unsupported gpu architecture 'compute_20'(数字与你在cmakelist选择的对应)的错误
+    解决办法：
+        这种错误的由于nvcc版本与CUDA版本不一致对应的
+        先查看自己电脑的nvcc版本
+        命令：nvcc --version
+        若是出现nvcc: NVIDIA (R) Cuda compiler driver
+        Copyright (c) 2005-2015 NVIDIA Corporation
+        Built on Tue_Aug_11_14:27:32_CDT_2015
+        Cuda compilation tools, release 7.5, V7.5.17
+        这样的字符段表示你的nvcc版本是7.5，但是我安装的是11.1，因此版本不对，所以需要将7.5版本的卸载
+        卸载命令：sudo apt-get autoremove nvidia-cuda-toolkit
+        之后查看/usr/local/cuda/bin/文件夹下是否有nvcc,若是有则利用软连接将其版本链接起来
+        命令：sudo ln -s /usr/local/cuda/bin/nvcc  /usr/bin/nvcc
+    5.2 在编译的时候还会遇到一个问题是cc1plus: fatal error: cuda_runtime.h: 没有那个文件或目录
+        这个问题的解决办法是在.bashrc文件中加入环境变量：
+        export PATH="/usr/local/cuda-11.1/bin:$PATH" 
+        export LD_LIBRARY_PATH="/usr/local/cuda-11.1/lib64:$LD_LIBRARY_PATH" 
+        之后执行source .bashrc
+6.运行仿真命令：
+        roslaunch exploration_manager exploration.launch
+        roslaunch exploration_manager rviz.launch

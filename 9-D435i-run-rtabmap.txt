@@ -1,0 +1,38 @@
+1.二进制安装
+安装以下三个包：imu_filter_madgwick、rtabmap_ros和robot_localization
+命令：
+sudo apt-get install ros-kinetic-imu-filter-madgwick  
+sudo apt-get install ros-kinetic-rtabmap-ros  
+sudo apt-get install ros-kinetic-robot-localization  
+2. 启动
+2.1 启动相机：
+roslaunch realsense2_camera rs_camera.launch \
+    align_depth:=true \
+    unite_imu_method:="linear_interpolation" \
+    enable_gyro:=true \
+     enable_accel:=true
+
+2.2启动imu_filter_madgwick
+rosrun imu_filter_madgwick imu_filter_node \
+    _use_mag:=false \
+    _publish_tf:=false \
+    _world_frame:="enu" \
+    /imu/data_raw:=/camera/imu \
+    /imu/data:=/rtabmap/imu
+2.3启动rtabmap-RGB版
+roslaunch rtabmap_ros rtabmap.launch \
+    rtabmap_args:="--delete_db_on_start --Optimizer/GravitySigma 0.3" \
+    depth_topic:=/camera/aligned_depth_to_color/image_raw \
+    rgb_topic:=/camera/color/image_raw \
+    camera_info_topic:=/camera/color/camera_info \
+    approx_sync:=false \
+    wait_imu_to_init:=true \
+    imu_topic:=/rtabmap/imu
+3.保存地图为pcd文件
+
+rosrun pcl_ros pointcloud_to_pcd input:=/rtabmap/cloud_map
+
+4.用到的参考网址：
+4.1. https://blog.csdn.net/rosfreshman/article/details/116404077?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522162031358116780269889514%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=162031358116780269889514&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_v2~rank_v29-3-116404077.first_rank_v2_pc_rank_v29&utm_term=D435i%E8%BF%90%E8%A1%8Crtabmap
+
+4.2 http://wiki.ros.org/rtabmap_ros/Tutorials/HandHeldMapping

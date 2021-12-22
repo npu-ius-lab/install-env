@@ -1,0 +1,21 @@
+sudo apt remove librealsense2-utils 先把之前的realsense卸载了
+添加key：sudo apt-key adv --keyserver keys.gnupg.net --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE || sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE
+添加链接库：sudo add-apt-repository "deb http://realsense-hw-public.s3.amazonaws.com/Debian/apt-repo bionic main" -u
+sudo apt-get install librealsense2-dkms
+
+后面那个是版本号
+sudo apt install librealsense2=2.48.0-5ubuntu5~1.gbp156c1b
+sudo apt install librealsense2-gl=2.48.0-5ubuntu5~1.gbp156c1b
+sudo apt install librealsense2-utils=2.48.0-5ubuntu5~1.gbp156c1b
+sudo apt install librealsense2-dev=2.48.0-5ubuntu5~1.gbp156c1b
+sudo apt remove librealsense2-udev-rules
+sudo apt install librealsense2-udev-rules=2.48.0-5ubuntu5~1.gbp156c1b
+
+你可以用sudo apt-cache policy librealsense2
+看有哪些版本的realsense可以安装
+2.30.0-0~realsense0.1693
+2.30.0-5ubuntu5~1.gbp9f99fa
+查询可以安装的版本号的
+然后安装的时候把查询到能安装的版本选择一个版本号放后面
+
+sudo gedit /etc/apt/sources.list

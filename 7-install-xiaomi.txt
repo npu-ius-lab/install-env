@@ -1,0 +1,24 @@
+此安装教程可以按照以下网址进行：
+    https://mynt-eye-d-sdk.readthedocs.io/zh_CN/latest/sdk/install_ubuntu_src.html
+    若是已经安装ros系统，可以按照如下步骤进行安装：
+1. 先安装SDK（我们的是深度相机，因此安装深度版(D)）(安装时设备需插入电脑，需要USB3.0)
+    1.1. 下载SDK
+        git clone https://github.com/slightech/MYNT-EYE-D-SDK.git
+        cd MYNT-EYE-D-SDK
+    1.2. 初始化SDK
+        make init 
+    因为设备权限的问题，命令执行完成之后，必须重新拔插设备(这个操作在同一台电脑上，只需要做一次)。
+    1.3. 编译SDK
+        make all
+    1.4 运行例程，检测安装是否成功
+        ./samples/_output/bin/get_stereo_image
+        get_stereo_image 显示左右目的图像和彩色深度图
+2. 安装ROS版封装包
+    安装命令：
+        cd MYNT-EYE-D-SDK
+        make init
+        make ros
+    测试例程：
+        roscore
+        source ./wrappers/ros/devel/setup.bash
+        roslaunch mynteye_wrapper_d display.launch

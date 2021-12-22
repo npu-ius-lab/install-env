@@ -1,0 +1,10 @@
+1. 安装cpufrequtils
+命令：
+sudo apt install cpufrequtils
+2. 设置：
+命令：
+sudo cpufreq-set -g performance
+3. 查询
+命令：
+sudo i7z 
+(若是没有，则安装：sudo apt install i7z -y)

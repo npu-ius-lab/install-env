@@ -1,0 +1,17 @@
+该建图程序包是与VINS或者ORB_slam2对应的，因此在利用该建图软件包时，必须下载安装VINS（我用的是VINS）
+安装步骤：
+1.下载,编译：
+mkdir -p /catkin_ws/src
+git clone https://github.com/HKUST-Aerial-Robotics/DenseSurfelMapping.git
+cd ..
+catkin_make
+2. 运行
+因为是与VINS一起运行的，因此必须先开启VINS
+roslaunch realsense2_camera rs_camera_vins.launch 
+roslaunch vins vins_rviz.launch 
+rosrun vins vins_node ~/catkin_ws/src/VINS-Fusion/config/realsense_d435i/realsense_stereo_imu_config.yaml
+
+开启回环
+rosrun loop_fusion loop_fusion_node ~/vins_ws/src/VINS-Fusion/config/realsense_d435i/realsense_stereo_imu_config.yaml
+开启节点
+roslaunch surfel_fusion vins_realsense.launch

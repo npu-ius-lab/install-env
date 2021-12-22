@@ -1,0 +1,57 @@
+# ROS系统安装
+可以根据以下博客安装
+**ROS系统安装步骤不分电脑架构，但是区分ROS系统版本：ubuntu16.04对应kinetic版本，ubuntu18.04对应melodic版本**
+https://blog.csdn.net/m0_46378002/article/details/107715308  
+**官方安装教程**
+http://wiki.ros.org/cn/kinetic/Installation/Ubuntu  
+具体安装步骤：  
+1. 第一步：  
+进入系统的软件与更新，把第一栏的ubuntu 软件中的几个对号全部选中，允许ubuntu下载其他源的软件  
+（实在不会操作的看上面博客的第一步）  
+2. 添加官方软件源  
+**建议使用国内源，速度快**
+清华源：sudo sh -c '. /etc/lsb-release && echo "deb http://mirrors.tuna.tsinghua.edu.cn/ros/ubuntu/ `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'  
+**官方源**
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+3. 设置秘钥  
+sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654   
+4. 安装  
+先更新：sudo apt-get update  
+安装桌面完整版（建议）：  
+sudo apt-get install ros-kinetic-desktop-full  
+（桌面完整版中包括PCL1.7,Opencv，因此装上ros后不需要单独装PCL和OpenCV，若是对版本有要求另说）  
+5. 初始化rosdep  
+sudo rosdep init  
+**（一般执行到这会有错误：ERROR: unable to process source https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/xxxxx)**
+**解决方法：这个问题一般都是被墙了缘故，因此可以通过添加域名的方式解决或者科学上网即可）**
+解决办法：   
+命令：sudo gedit /etc/resolv.conf   
+将打开的文件中   
+将原有的nameserver这一行注释，并添加以下两行   
+nameserver 8.8.8.8 #google域名服务器   
+nameserver 8.8.4.4 #google域名服务器   
+然后保存，退出之后再执行：sudo rosdep init   
+一般这样就会解决   
+若是以上方法不行的话，可以试试如下操作：   
+先在https://www.ipaddress.com/网站上查询raw.githubusercontent.com的IP地址   
+之后打开host文件，在最后一行添加：   
+185.199.108.133	raw.githubusercontent.com   
+保存后退出，退出之后再执行：sudo rosdep init   
+之后执行：   
+rosdep update   
+（该命令可能由于网速的原因，会出现出错的情况，这时多执行几遍即可，我有一次执行6-7遍）   
+如果以上几个方法都不行的话，这步可以跳过，经实际验证，不执行也不影响。   
+6. 环境配置   
+echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc   
+source ~/.bashrc   
+7. 构建工厂依赖   
+sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential   
+**此时ROS已经安装完成。你可以通过控制小乌龟的案例检测ROS系统是否安装完成**
+测试步骤：
+1. 安装小乌龟模拟器：  
+命令：sudo apt-get install ros-kinetic-ros-tutorials   
+2. 运行master节点：roscore   
+3. 运行小乌龟模拟器节点：rosrun turtlesim turtlesim_node   
+4. 运行键盘控制小龟节点：rosrun turtlesim turtle_teleop_key   
+若是能够控制小乌龟，则表明ROS系统安装成功，注意上述命令均需开启新的终端（一共开启三个终端）   
+

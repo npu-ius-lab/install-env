@@ -1,0 +1,41 @@
+第一步：查询主机地址：命令：ifconfig 
+     笔记本的IP地址：192.168.43.50
+     nuc的IP地址：192.168.43.174
+第二步：查询主机名：命令：hostname
+      笔记本的主机名：dtpmh-virtual-machine
+      nuc的主机名：xgd-NUC8i5BEK
+第三步：修改etc文件夹下的hosts文件（两台机器都必须要改）：
+       修改hosts文件的目的是将两电脑的IP和主机名绑定，两台电脑之间通过hostname就能找到对方
+       命令：gksu gedit /etc/hosts
+       在第三行输入：
+       笔记本的IP地址	笔记本的主机名
+       NUC的IP地址	nuc的主机名
+     （中间用TAB，不能用空格）
+       最后在文档尾部输入：“：wq!”保存即可。//用VIM编辑器才需要的操作
+第四步：两台PC重启网络：sudo /etc/init.d/networking restart
+第五步：安装chrony包，用于实现同步：安装命令：sudo apt-get install chrony
+第六步：安装ssh服务器，用于远程链接：安装命令：sudo apt-get install openssh-server
+              (确认ssh是否完全启动：命令：ps -e|grep ssh):若是出现sshd即表明完全启动。
+/**************下面开始进行通信*************************************************************/
+第七步：先检查两个计算机之间通信是否正常：
+              (先让笔记本ping NUC)命令：ssh  dtpmh-virtual-machine
+                                                           ping xgd-NUC8i5BEK
+              (再让NUC ping 笔记本)命令：ssh  xgd-NUC8i5BEK
+                                                            ping dtpmh-virtual-machine
+               如果成功，会出现...ms等字样
+第八步：跨机器运行节点：
+              主机运行roscore,命令：ssh dtpmh-virtual-machine
+                                                   roscore
+               然后打开新的终端，配置主机ROS_MASTER_URI,这样就可以使用刚刚启动的master
+               命令：export ROS_MASTER_URI=http://dtpmh-virtual-machine:11311
+                         rosrun turtlesim turtlesim_node
+                从机运行键盘节点，在NUC上配置ROS_MASTER_URI.这样台式机上的ROS才能指向笔记本上                已经启动的master
+                命令：ssh xgd-NUC8i5BEK
+                          export ROS_MASTER_URI=http://dtpmh-virtual-machine:11311
+                          rosrun rosrun turtlesim turtle_teleop_key
+第九步（可选使得命令方便）
+                 在两台机器上编辑.bashrc文件
+                 在从机（NUC）上加上：export ROS_HOSTNAME=xgd-NUC8i5BEK
+                                                    export ROS_MASTER_URI=http://dtpmh-virtual-machine:11311
+                主机上（笔记本）加：export ROS_HOSTNAME=dtpmh-virtual-machine
+                                                     export ROS_MASTER_URI=http://dtpmh-virtual-machine:11311

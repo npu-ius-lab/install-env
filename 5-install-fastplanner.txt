@@ -1,0 +1,46 @@
+官方网址：
+https://github.com/HKUST-Aerial-Robotics/Fast-Planner
+安装步骤：
+1. ubuntu16.04+kinetic
+2. 安装依赖库：
+ubuntu16.04
+    sudo apt-get install libnlopt-dev libarmadillo-dev
+ubuntu18.04
+    sudo apt-get install libarmadillo-dev ros-melodic-nlopt
+3. 安装nlopt(ubuntu16.04需要安装，18.04不需要)
+    3.1 下载nlopt库：https://github.com/stevengj/nlopt
+    3.2 下载后解压到home文件夹下，执行以下命令：
+            cd nlopt 
+            mkdir build
+            cd build
+            cmake ..
+            make
+            sudo make install
+4. 创建工作空间
+    mkdir -p catkin_ws/src
+    cd catkin_ws
+    catkin_make
+    cd src 
+    git clone https://github.com/HKUST-Aerial-Robotics/Fast-Planner.git
+    cd ..
+    catkin_make
+5. 开始仿真
+    5.1 打开一个新的终端
+        cd catkin_ws
+    5.2 配置环境
+        source devel/setup.bash
+    5.3 运行仿真
+        roslaunch plan_manage simulation.launch（旧版的）
+        rosalunch plan_manage kino(双击tab补全)（新版的）
+    5.4 运行RVIZ
+        打开新的终端
+        cd catkin_ws
+        配置环境：
+        source devel/setup.bash
+        运行RVIZ
+        roslaunch plan_manage rviz.launch
+        注：若是不想每次都配置环境，则打开home文件夹下的隐藏文件.bashrc(CTRL+h显示隐藏文件)，在打开的文档最下面一行加入source ~/catkin_ws/devel/setup.bash，即可
+6.Fastplan发出的控制命令话题
+    /planning/pos_cmd  
+
+

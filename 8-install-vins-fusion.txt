@@ -1,0 +1,108 @@
+官方网站：https://github.com/HKUST-Aerial-Robotics/VINS-Fusion 
+安装步骤：
+1.	首先需安装ubnutu16.04 + ROS Kinetic
+2.	依赖库的安装：
+    2.1	Eigen库的安装
+        2.1.1下载Eigen库：https://gitlab.com/libeigen/eigen/-/releases (版本必须为3.3.7)
+	        解压到home文件夹下：
+	        执行以下命令进行安装：
+            cd eigen-3.3.7/
+            mkdir build
+            cd build
+            cmake ..
+            sudo make
+            sudo make install
+        2.1.2	
+        复制Eigen库到 /usr/local/include 中 （这一步很重要，一定要执行，否则后面编译一些程序，会提示没有Eigen库）
+            sudo cp -r /usr/local/include/eigen3/Eigen /usr/local/include
+    2.2 ceres库的安装：
+        注：若是以前安装过ceres库，在运行的时候可能会出现与Eigen3.3版本冲突的情况，因此需要将以前安装的删除
+        命令：
+            sudo rm -r /usr/local/lib/cmake/Ceres
+            sudo rm -rf /usr/local/include/ceres /usr/local/lib/libceres.a
+            sudo rm -r /usr/local/share/Ceres
+        2.2.1 安装依赖
+            sudo apt install cmake libeigen3-dev 
+            sudo apt install libgoogle-glog-dev libatlas-base-dev libsuitesparse-dev
+        2.2.2 下载ceres库：wget ceres-solver.org/ceres-solver-1.14.0.tar.gz （版本必须为1.14）
+        2.2.3 下载好后解压到home文件夹下：
+            执行以下命令：cd ceres-solver-1.14.0 
+                        mkdir build
+                        cd build
+                        cmake ..
+                        make
+                        sudo make install
+3.  创建工作空间，并编译
+    mkdir -p catkin_ws/src
+    cd catkin_ws
+    catkin_make
+    cd src 
+    git clone https://github.com/HKUST-Aerial-Robotics/VINS-Fusion.git
+    cd ..
+    catkin_make
+
+4. 开始仿真
+    配置环境：
+    打开home文件夹下的隐藏文件.bashrc(CTRL+h显示隐藏文件)，在打开的文档最下面一行加入source ~/catkin_ws/devel/setup.bash，即可
+    运行仿真：
+    打开一个新的终端
+        roslaunch vins vins_rviz.launch    
+        rosrun vins vins_node ~/catkin_ws/src/VINS-Fusion/config/euroc/euroc_stereo_imu_config.yaml 
+        rosbag play YOUR_DATASET_FOLDER/MH_01_easy.bag
+5.  配置D435i运行VINS
+    5.1.修改realsense文件
+        修改~/catkin_ws/src/realsense/realsense2_camera/launch/目录下的rs_camera.launch，重命名为rs_camera_vins.launch，将它保存在同目录下。修改内容主要有：
+        //打开imu
+            <arg name="enable_gyro"         default="true"/>
+            <arg name="enable_accel"        default="true"/>
+        //联合方式copy或linear_interpolation
+            <arg name="unite_imu_method"          default="linear_interpolation"/>
+        //时间戳同步
+            <arg name="enable_sync"               default="true"/>
+        //打开双目相机
+            <arg name="enable_gyro"         default="true"/>
+            <arg name="enable_accel"        default="true"/>
+        完整的rs_camera_vins.launch见rs_camera_vins.launch.txt
+    5.2.修改VINS文件
+        修改相机的外参（不改的话漂移严重）
+        在realsense_stereo_imu_config.yaml、left.yaml、right.yaml,分别对应body_T_cam0、body_T_cam1两个外参合两个projection_parameters内参，D435i的参数可以从SDK查看，查看方法：https://blog.csdn.net/mystyle_/article/details/109353870，或者直接根据我的直接修改：
+        其中外参：
+            body_T_cam0: !!opencv-matrix
+                rows: 4
+                cols: 4
+                dt: d
+                data: [ 1, 0, 0, -0.00552,
+                        0, 1, 0, 0.0051,
+                        0, 0, 1, 0.01174,
+                        0, 0, 0, 1 ]
+
+            body_T_cam1: !!opencv-matrix
+                rows: 4
+                cols: 4
+                dt: d
+                data: [ 1, 0, 0, 0.0446571,
+                        0, 1, 0, 0.0051,
+                        0, 0, 1, 0.01174,
+                        0, 0, 0, 1 ]
+        两个内参（左右目是一样的）：
+            projection_parameters:
+            fx: 383.692
+            fy: 383.692
+            cx: 316.978
+            cy: 239.796
+        修改显示image-track（默认为0）：
+            show_track = 1
+    运行命令：
+        roslaunch realsense2_camera rs_camera_vins.launch 
+        roslaunch vins vins_rviz.launch 
+        rosrun vins vins_node ~/catkin_ws/src/VINS-Fusion/config/realsense_d435i/realsense_stereo_imu_config.yaml
+6.  配置小觅相机运行VINS
+    小觅相机不需要修改文件，因为VINS中有对应于小觅相机的launch文件
+    具体启动如下：
+        cd ~/MYNT-EYE-D-SDK
+        source ./wrappers/ros/devel/setup.bash
+        roslaunch mynteye_wrapper_d vins_fusion.launch
+        roslaunch vins vins_rviz.launch
+        rosrun vins vins_node /home/dtpmh/LearnROS/src/VINS-Fusion/config/mynteye-d/mynt_stereo_imu_config.yaml
+7.  VINS发布的结果话题
+    /vins_estimator/odometry
