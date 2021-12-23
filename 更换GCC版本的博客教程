@@ -1,0 +1,18 @@
+https://blog.csdn.net/qq_31175231/article/details/77774971
+https://blog.csdn.net/qq_30653631/article/details/108057577
+
+ubuntu16.04更换GCC版本
+系统可以同时存在多个gcc版本
+安装命令：
+sudo apt-get install gcc-5.0
+查看版本：
+gcc --version
+设置默认版本
+查看默认版本：
+ls /usr/bin/gcc*
+设置版本优先级
+sudo update-alternative --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 100
+设置默认版本
+sudo update-alternatives --config gcc
+删除：
+sudo update-alternatives --remove xxx

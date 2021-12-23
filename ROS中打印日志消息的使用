@@ -1,0 +1,32 @@
+1.日志消息
+
+简单来讲日志就是我们在写C++程序时的printf，对于调试来说有至关重要的的作用，日志根据严重程度分为五个等级：DEBUG, INFO, WARN, ERROR, FATAL.
+
+在写ROS代码的时候我们用下边的代码来讲日志信息打印到终端中：
+
+ROS_DEBUG_STREAM(message);
+ROS_INFO_STREAM(message);
+ROS_WARN_STREAM(message);
+ROS_ERROR_STREAM(message);
+ROS_FATAL_STREAM(message);
+
+一次性打印，在循环中如果重复调用时仅第一次被打印
+
+ROS_DEBUG_STREAM_ONCE(message);
+ROS_INFO_STREAM_ONCE (message);
+ROS_WARN_STREAM_ONCE (message);
+ROS_ERROR_STREAM_ONCE (message);
+ROS_FATAL_STREAM_ONCE (message);
+
+指定频率打印
+
+ROS_DEBUG_STREAM_THROTTLE(interval,message);
+
+ROS_INFO_STREAM_THROTTLE(interval,message);
+
+ROS_WARN_STREAM_THROTTLE(interval,message);
+
+ROS_ERROR_STREAM_THROTTLE(interval,messge);
+
+ROS_FATAL_STREAM_THROTTLE(interval,message);
+

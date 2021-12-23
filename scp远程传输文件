@@ -1,0 +1,60 @@
+利用SCP命令进行两个linux系统通讯
+注意：两个Linux系统必须处于一个局域网下
+前提条件：scp就是secure copy，是一个在linux下用来进行远程拷贝文件的命令
+操作：
+1.免密登录远程设备
+基本场景是想从一台Server服务器直接登录另一台，或者将Server服务器的数据不需密码验证直接拷贝至Client服务器，以下我们简称Server服务器为S（待发送的数据文件在这台服务器上），Client服务为C，信任关系的最简单操作方法如下：
+1.1. 在S服务器上，进入当前用户根目录下的隐藏目录 .ssh，命令如下：
+
+cd ~/.ssh
+1.2. 生成S服务器的私钥和公钥
+ssh-add id_rsa
+    系统如果提示：Identity added: id_rsa (id_rsa) 就表明加载成功了
+    下面有几个异常情况处理：
+    –如果系统提示：could not open a connection to your authentication agent
+    则需要执行一下命令：ssh-agent bash
+    然后再执行上述的ssh-add id_rsa命令
+    –如果系统提示id_rsa: No such file or directory
+    这是系统无法找到私钥文件id_rsa，需要看看当前路径是不是不在.ssh目录，或者私钥文件改了名字，例如如果建立的时候改成 aa_rsa，则这边命令中也需要相应改一下
+    -如果系统提示 command not found，那肯定是你命令敲错字符了J
+    -提示Agent admitted failure to sign using the key，私钥没有加载成功，重试ssh-add
+    -注意id_rsa/id_rsa.pub文件不要删除，存放在.ssh目录下 
+1.3把公钥拷贝到C服务器上
+scp id_rsa.pub user@192.16843.219:~//该命令的意思是将id_rsa.pub拷贝到远端主机（主机名叫user，后面是ip地址）的主目录下
+1.4 在远端主机上建立.ssh文件夹
+ssh user@192.168.43.219 "mkdir .ssh" 
+1.5 在远程主机上创建authorized_keys文件
+在远程主机上操作：
+touch ~/.ssh/authorized_keys
+1.6将公钥id_rsa.pub追加到authorized_keys中
+cat id_rsa.pub >> ~/.ssh/authorized_keys
+
+2.本地拷贝到远程
+2.1 本地文件拷贝到远程主机
+scp  local_file  remote_user@remote_ip:remote_directory//local_file表示文件名，remote_user是远程主机名，remote_ip是远程主机ip,remote_directory是要拷贝到的远程主机文件夹
+2.2 本地文件拷贝到远程目录，并对文件重命名
+scp  local_file  remote_user@remote_ip:remote_file
+2.3本地目录拷贝到远程主机目录下：
+scp  -r local_directory  remote_user@remote_ip:remote_directory
+3. 远程拷贝到本地
+远程文件拷贝到本地目录：
+scp  remote_user@remote_ip:remote_file  local_directory
+远程文件拷贝到本地目录，并对文件重命名：
+scp  remote_user@remote_ip:remote_file local_file
+远程目录拷贝到本地目录
+scp  remote_user@remote_ip:remote_directory local_directory
+4. scp常用参数
+-r 递归拷贝整个目录
+
+-p 保留原文件的修改时间，访问时间和访问权限
+
+-P 指定远端服务器的SSH端口号
+
+参考文献：
+https://blog.csdn.net/u013139008/article/details/89418794?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522162613745116780357269561%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=162613745116780357269561&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-89418794.first_rank_v2_pc_rank_v29&utm_term=scp%E4%BD%BF%E7%94%A8&spm=1018.2226.3001.4187
+
+https://blog.csdn.net/nlforever/article/details/11993415?ops_request_misc=&request_id=&biz_id=102&utm_term=scp%E4%BD%BF%E7%94%A8&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-2-.nonecase&spm=1018.2226.3001.4187
+
+https://blog.csdn.net/github_37216944/article/details/79367817
+
+https://www.cnblogs.com/wangcp-2014/p/5134413.html

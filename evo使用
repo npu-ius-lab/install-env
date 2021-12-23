@@ -1,0 +1,24 @@
+evo_traj tum mono.txt  --ref=data.tum -p --plot_mode=xyz --align --correct_scale
+
+
+evo_traj tum L_13.txt v13.txt -p 
+
+
+
+evo_ape tum data.tum PL-VIO.txt -va --plot  --save_results end.zip
+
+
+
+
+
+
+
+
+
+evo_res end.zip old.zip new.zip -p --save_table table.csv
+
+
+转换 evo_traj euroc data.csv --save_as_tum
+
+evo_rpe tum data.tum L_11.txt -va --plot
+
