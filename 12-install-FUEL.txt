@@ -27,6 +27,9 @@ FUEL的安装步骤
         cd src/
         git clone https://github.com.cnpmjs.org/HKUST-Aerial-Robotics/FUEL.git
         catkin_make
+        如果遇到：/usr/bin can't find ldw问题
+        解决办法：sudo apt-get install libdw-dev
+        再执行编译即可。
 4.根据你自己的显卡版本以及CUDA版本修改cmakelists文件
         查看自己显卡以及驱动版本命令：
             nvidia-smi
